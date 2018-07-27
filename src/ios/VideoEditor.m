@@ -54,6 +54,16 @@
 
     NSString *inputFilePath = [options objectForKey:@"fileUri"];
     NSURL *inputFileURL = [self getURLFromFilePath:inputFilePath];
+    
+    if(inputFileURL == nil || [inputFileURL isKindOfClass:[NSNull class]]) {
+        
+        NSString *error = [NSString stringWithFormat:@"Video URL was not retrieved from file path"];
+        NSLog(@"%@", error);
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error] callbackId:command.callbackId];
+        
+        return;
+    }
+    
     NSString *videoFileName = [options objectForKey:@"outputFileName"];
     CDVOutputFileType outputFileType = ([options objectForKey:@"outputFileType"]) ? [[options objectForKey:@"outputFileType"] intValue] : MPEG4;
     BOOL optimizeForNetworkUse = ([options objectForKey:@"optimizeForNetworkUse"]) ? [[options objectForKey:@"optimizeForNetworkUse"] intValue] : NO;
@@ -332,6 +342,15 @@
 
     NSString *filePath = [options objectForKey:@"fileUri"];
     NSURL *fileURL = [self getURLFromFilePath:filePath];
+    
+    if(fileURL == nil || [fileURL isKindOfClass:[NSNull class]]) {
+        
+		NSString *error = [NSString stringWithFormat:@"Video URL was not retrieved from file path"];
+        NSLog(@"%@", error);
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error] callbackId:command.callbackId];
+
+        return;
+    }
 
     unsigned long long size = [[NSFileManager defaultManager] attributesOfItemAtPath:[fileURL path] error:nil].fileSize;
 
@@ -397,6 +416,16 @@
     }
     NSString *inputFilePath = [options objectForKey:@"fileUri"];
     NSURL *inputFileURL = [self getURLFromFilePath:inputFilePath];
+    
+    if(inputFileURL == nil || [inputFileURL isKindOfClass:[NSNull class]]) {
+        
+        NSString *error = [NSString stringWithFormat:@"[Trim]: Video URL was not retrieved from file path"];
+        NSLog(@"%@", error);
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error] callbackId:command.callbackId];
+                 
+        return;
+    }
+    
     float trimStart = [[options objectForKey:@"trimStart"] floatValue];
     float trimEnd = [[options objectForKey:@"trimEnd"] floatValue];
     NSString *outputName = [options objectForKey:@"outputFileName"];
@@ -559,6 +588,11 @@
 
 - (NSURL*)getURLFromFilePath:(NSString*)filePath
 {
+    if(filePath == nil || filePath == (NSString *)[NSNull null] || filePath.length == 0) {
+    
+        return nil;
+    }
+    
     if ([filePath containsString:@"assets-library://"]) {
         return [NSURL URLWithString:[filePath stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     } else if ([filePath containsString:@"file://"]) {
